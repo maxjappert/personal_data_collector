@@ -34,8 +34,9 @@ def main():
     ''')
 
     cur.execute("SELECT COUNT(*) FROM day_tracker")
-    print(f'Hello, welcome to your own personal data tracker. We currently have {cur.fetchone()[0]} entries!')
-    date_str = input('Please enter the date you want to update (dd.mm.yy):')
+    initial_entries = cur.fetchone()[0]
+    print(f'Hello, welcome to your own personal data tracker. We currently have {initial_entries} entries!')
+    date_str = input('Please enter the date you want to update (dd.mm.yy): ')
 
     # Normalised to UTC
     date_obj = datetime.strptime(date_str, date_format).replace(tzinfo=timezone.utc)
@@ -45,7 +46,7 @@ def main():
 
     # Case where there is already an entry for that date
     if cur.fetchone() is not None:
-        to_delete = input('There is already an entry for this timestamp. Shall it be deleted? (y/[n]):')
+        to_delete = input('There is already an entry for this timestamp. Shall it be deleted? (y/[n]): ')
 
         if to_delete.lower() == 'y':
             cur.execute(f"DELETE FROM day_tracker WHERE timestamp = {timestamp}")
@@ -55,8 +56,8 @@ def main():
 
     # TODO: proper error handling
     # Here the questions are asked
-    overall_quality = int(input('Overall quality of the day (1-5): '))
-    assert [1, 2, 3, 4, 5].__contains__(overall_quality)
+    overall_quality = int(input('Overall quality of the day (1-10): '))
+    assert list(range(1, 11)).__contains__(overall_quality)
 
     rumination = convert_bool_string_to_intbool(input('Did you have a headache-inducing rumination attack? (y/n) '))
 
@@ -106,6 +107,11 @@ def main():
         drank_alcohol, smoked_weed, dream, main_takeaway
     ))
     conn.commit()
+
+    cur.execute("SELECT COUNT(*) FROM day_tracker")
+    final_entries = cur.fetchone()[0]
+
+    assert final_entries == initial_entries + 1, "ERROR: The entry wasn't added to the database for some reason."
 
     print('Entry saved. Have a fantastic day!')
 
