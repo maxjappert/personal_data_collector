@@ -175,6 +175,9 @@ ENV/
 env.bak/
 venv.bak/
 
+*.xml
+.idea/
+
 # Spyder project settings
 .spyderproject
 .spyproject

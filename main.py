@@ -1,7 +1,11 @@
+import os
 import sqlite3
 from datetime import datetime, timezone
+from pathlib import Path
 
 date_format = '%d.%m.%y'
+
+BASE_DIR = Path(__file__).resolve().parent
 
 def convert_bool_string_to_intbool(yn_string: str):
     if yn_string.lower() == 'y':
@@ -12,7 +16,7 @@ def convert_bool_string_to_intbool(yn_string: str):
         return -1
 
 def main():
-    conn = sqlite3.connect('data.db')
+    conn = sqlite3.connect(os.path.join(BASE_DIR, 'data.db'))
     cur = conn.cursor()
 
     cur.execute('''
