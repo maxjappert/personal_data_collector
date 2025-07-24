@@ -40,21 +40,28 @@ def main():
     cur.execute("SELECT COUNT(*) FROM day_tracker")
     initial_entries = cur.fetchone()[0]
     print(f'Hello, welcome to your own personal data tracker. We currently have {initial_entries} entries!')
-    date_str = input('Please enter the date you want to update (dd.mm.yy): ')
 
-    # Normalised to UTC
-    date_obj = datetime.strptime(date_str, date_format).replace(tzinfo=timezone.utc)
-    timestamp = date_obj.timestamp()
+    date_selected = False
 
-    cur.execute(f"SELECT 1 FROM day_tracker WHERE timestamp = ? LIMIT 1", (timestamp,))
+    while not date_selected:
+        date_str = input('Please enter the date you want to update (dd.mm.yy): ')
 
-    # Case where there is already an entry for that date
-    if cur.fetchone() is not None:
-        to_delete = input('There is already an entry for this timestamp. Shall it be deleted? (y/[n]): ')
+        # Normalised to UTC
+        date_obj = datetime.strptime(date_str, date_format).replace(tzinfo=timezone.utc)
+        timestamp = date_obj.timestamp()
 
-        if to_delete.lower() == 'y':
-            cur.execute(f"DELETE FROM day_tracker WHERE timestamp = {timestamp}")
-            print("Okay, the old entry has been deleted. Let's continue.")
+        cur.execute(f"SELECT 1 FROM day_tracker WHERE timestamp = ? LIMIT 1", (timestamp,))
+
+        # Case where there is already an entry for that date
+        if cur.fetchone() is not None:
+            to_delete = input('There is already an entry for this timestamp. Shall it be deleted? (y/[n]): ')
+
+            if to_delete.lower() == 'y':
+                cur.execute(f"DELETE FROM day_tracker WHERE timestamp = {timestamp}")
+                date_selected = True
+                print("Okay, the old entry has been deleted. Let's continue.")
+        else:
+            date_selected = True
 
     print('Please answer the following questions, pertaining to the day of interest:')
 
